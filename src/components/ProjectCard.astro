@@ -1,0 +1,50 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  tagline?: string;
+  description: string;
+  category: string;
+  tags: string[];
+  featured?: boolean;
+  index?: number;
+}
+
+const { slug, title, tagline, description, category, tags, index = 0 } = Astro.props;
+---
+
+<a
+  href={`/projects/${slug}`}
+  data-reveal
+  style={`transition-delay: ${index * 80}ms`}
+  class="group block p-6 md:p-8 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/50 bg-neutral-50/50 dark:bg-neutral-900/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300"
+>
+  <div class="flex items-center justify-between mb-4">
+    <span class="text-xs font-mono font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+      {category}
+    </span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-400 group-hover:text-emerald-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M7 17L17 7M7 7h10v10" />
+    </svg>
+  </div>
+
+  <h3 class="text-xl font-semibold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+    {title}
+  </h3>
+  {tagline && <p class="text-sm font-medium text-neutral-500 mt-1">{tagline}</p>}
+
+  <p class="mt-4 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed line-clamp-3">
+    {description}
+  </p>
+
+  <div class="mt-5 flex flex-wrap gap-2">
+    {tags.slice(0, 4).map((tag) => (
+      <span class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+        {tag}
+      </span>
+    ))}
+    {tags.length > 4 && (
+      <span class="text-xs px-2.5 py-1 text-neutral-400">+{tags.length - 4} more</span>
+    )}
+  </div>
+</a>

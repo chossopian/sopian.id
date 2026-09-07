@@ -1,0 +1,57 @@
+---
+import { experience, education, certifications } from '../data/profile';
+---
+
+<section id="experience" class="max-w-5xl mx-auto px-6 py-20 md:py-28 border-t border-neutral-200 dark:border-neutral-800">
+  <div data-reveal class="mb-12">
+    <p class="text-sm font-semibold text-emerald-500 mb-2">Career journey</p>
+    <h2 class="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
+      Work Experience
+    </h2>
+  </div>
+
+  <div class="relative border-l border-neutral-200 dark:border-neutral-800 ml-3">
+    {experience.map((job, i) => (
+      <div data-reveal style={`transition-delay: ${i * 60}ms`} class="relative pl-8 pb-12 last:pb-0">
+        <span class="absolute -left-[7px] top-1.5 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-neutral-950"></span>
+        <p class="text-xs font-mono text-neutral-500 mb-1">{job.period}</p>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">{job.title}</h3>
+        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-3">{job.company}</p>
+        <ul class="space-y-2">
+          {job.points.map((point) => (
+            <li class="text-sm text-neutral-600 dark:text-neutral-400 flex items-start gap-2 leading-relaxed">
+              <span class="text-neutral-400 dark:text-neutral-600 mt-1">&bull;</span>
+              <span>{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="grid sm:grid-cols-2 gap-8 mt-12">
+    <div data-reveal class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+      <h3 class="font-semibold text-neutral-900 dark:text-white mb-4">Education</h3>
+      {education.map((edu) => (
+        <div>
+          <p class="text-xs font-mono text-neutral-500">{edu.period}</p>
+          <p class="font-medium text-neutral-800 dark:text-neutral-200 mt-1">{edu.degree}</p>
+          <p class="text-sm text-neutral-500">{edu.school}</p>
+          <p class="text-sm text-emerald-600 dark:text-emerald-400 mt-1">{edu.detail}</p>
+        </div>
+      ))}
+    </div>
+
+    <div data-reveal class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+      <h3 class="font-semibold text-neutral-900 dark:text-white mb-4">Certifications</h3>
+      <ul class="space-y-3">
+        {certifications.map((cert) => (
+          <li>
+            <p class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{cert.name}</p>
+            <p class="text-xs text-neutral-500">{cert.issuer}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

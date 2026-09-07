@@ -1,0 +1,59 @@
+---
+import { marked } from 'marked';
+import Layout from '../../layouts/Layout.astro';
+import { getPostBySlug } from '../../lib/supabase';
+
+const { slug } = Astro.params;
+const post = slug ? await getPostBySlug(slug) : null;
+
+if (!post) {
+  return Astro.redirect('/blog');
+}
+
+const htmlContent = marked.parse(post.content);
+
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+---
+
+<Layout title={post.title} description={post.excerpt || post.title} image={post.cover_image || undefined}>
+  <article class="max-w-3xl mx-auto px-6 py-20 md:py-28">
+    <a href="/blog" class="inline-flex items-center gap-2 text-sm font-medium text-neutral-500 hover:text-emerald-500 transition-colors mb-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+      Back to Blog
+    </a>
+
+    <div data-reveal>
+      <p class="text-xs font-mono text-neutral-500 mb-3">{formatDate(post.published_at)}</p>
+      <h1 class="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
+        {post.title}
+      </h1>
+
+      {post.tags && post.tags.length > 0 && (
+        <div class="mt-4 flex flex-wrap gap-2">
+          {post.tags.map((tag) => (
+            <span class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {post.cover_image && (
+        <img src={post.cover_image} alt={post.title} class="mt-8 w-full rounded-2xl border border-neutral-200 dark:border-neutral-800" />
+      )}
+    </div>
+
+    <div
+      data-reveal
+      class="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-a:text-emerald-500 max-w-none mt-10 pt-10 border-t border-neutral-200 dark:border-neutral-800"
+      set:html={htmlContent}
+    />
+  </article>
+</Layout>

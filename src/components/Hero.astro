@@ -1,0 +1,51 @@
+---
+import { profile } from '../data/profile';
+---
+
+<section class="relative max-w-5xl mx-auto px-6 pt-20 pb-24 md:pt-32 md:pb-32 overflow-hidden">
+  <!-- Background grid pattern -->
+  <div class="absolute inset-0 -z-10 [background-image:radial-gradient(circle_at_1px_1px,theme(colors.neutral.300)_1px,transparent_0)] dark:[background-image:radial-gradient(circle_at_1px_1px,theme(colors.neutral.800)_1px,transparent_0)] [background-size:24px_24px] opacity-40 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent)]"></div>
+
+  <div data-reveal>
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-200 dark:border-neutral-800 text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-6">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      Available for new opportunities
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-neutral-900 dark:text-white leading-[1.1]">
+      {profile.name}
+    </h1>
+    <p class="mt-4 text-xl md:text-2xl font-medium text-emerald-600 dark:text-emerald-400">
+      {profile.role}
+    </p>
+
+    <p class="mt-6 max-w-2xl text-base md:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
+      {profile.summary}
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center gap-4">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-6 py-3 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity"
+      >
+        View Projects
+      </a>
+      <a
+        href={`mailto:${profile.email}`}
+        class="inline-flex items-center gap-2 border border-neutral-300 dark:border-neutral-700 px-6 py-3 rounded-full text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
+      >
+        Contact Me
+      </a>
+    </div>
+
+    <div class="mt-8 flex items-center gap-2 text-sm text-neutral-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
+      </svg>
+      {profile.location}
+    </div>
+  </div>
+</section>

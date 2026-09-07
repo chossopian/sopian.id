@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const allProjects = await getCollection('projects');
+const sorted = allProjects.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout title="Projects" description="A selection of projects built by Muhamad Sopian — spanning AI automation pipelines, enterprise systems, and self-hosted infrastructure.">
+  <section class="max-w-5xl mx-auto px-6 py-20 md:py-28">
+    <div data-reveal class="mb-12">
+      <p class="text-sm font-semibold text-emerald-500 mb-2">Portfolio</p>
+      <h1 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white tracking-tight">
+        Projects
+      </h1>
+      <p class="mt-4 max-w-2xl text-neutral-600 dark:text-neutral-400">
+        A collection of systems and platforms I've designed and built — from AI-driven automation pipelines to enterprise administration tools.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      {sorted.map((project, i) => (
+        <ProjectCard
+          slug={project.id}
+          title={project.data.title}
+          tagline={project.data.tagline}
+          description={project.data.description}
+          category={project.data.category}
+          tags={project.data.tags}
+          index={i}
+        />
+      ))}
+    </div>
+
+    {sorted.length === 0 && (
+      <p class="text-neutral-500 text-center py-20">No projects yet. Check back soon!</p>
+    )}
+  </section>
+</Layout>

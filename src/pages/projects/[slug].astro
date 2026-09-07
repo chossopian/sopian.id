@@ -1,0 +1,69 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Layout title={project.data.title} description={project.data.description}>
+  <article class="max-w-3xl mx-auto px-6 py-20 md:py-28">
+    <a href="/projects" class="inline-flex items-center gap-2 text-sm font-medium text-neutral-500 hover:text-emerald-500 transition-colors mb-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+      Back to Projects
+    </a>
+
+    <div data-reveal>
+      <span class="text-xs font-mono font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+        {project.data.category}
+      </span>
+
+      <h1 class="mt-4 text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
+        {project.data.title}
+      </h1>
+      {project.data.tagline && (
+        <p class="mt-2 text-lg font-medium text-neutral-500">{project.data.tagline}</p>
+      )}
+
+      <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-neutral-500">
+        {project.data.role && <span>{project.data.role}</span>}
+        {project.data.role && project.data.period && <span>&bull;</span>}
+        {project.data.period && <span>{project.data.period}</span>}
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        {project.data.tags.map((tag: string) => (
+          <span class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-4">
+        {project.data.liveUrl && (
+          <a href={project.data.liveUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity">
+            Visit Live Site
+          </a>
+        )}
+        {project.data.repoUrl && (
+          <a href={project.data.repoUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border border-neutral-300 dark:border-neutral-700 px-5 py-2.5 rounded-full text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:border-emerald-500 hover:text-emerald-500 transition-colors">
+            View Source
+          </a>
+        )}
+      </div>
+    </div>
+
+    <div data-reveal class="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-a:text-emerald-500 max-w-none mt-12 pt-12 border-t border-neutral-200 dark:border-neutral-800">
+      <Content />
+    </div>
+  </article>
+</Layout>
