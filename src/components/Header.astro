@@ -1,4 +1,6 @@
 ---
+import { profile } from '../data/profile';
+
 const navLinks = [
   { href: '/#about', label: 'About' },
   { href: '/#experience', label: 'Experience' },
@@ -32,6 +34,13 @@ const currentPath = Astro.url.pathname;
     </div>
 
     <div class="flex items-center gap-4">
+      <a
+        href={profile.cvUrl}
+        download
+        class="hidden sm:inline-flex items-center gap-2 border border-neutral-300 dark:border-neutral-700 px-4 py-1.5 rounded-full text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:border-emerald-500 hover:text-emerald-500 transition-colors"
+      >
+        Resume
+      </a>
       <button
         id="theme-toggle"
         aria-label="Toggle dark mode"
@@ -59,6 +68,9 @@ const currentPath = Astro.url.pathname;
         {link.label}
       </a>
     ))}
+    <a href={profile.cvUrl} download class="block py-2 text-sm font-medium text-emerald-500">
+      Download CV
+    </a>
   </div>
 </header>
 

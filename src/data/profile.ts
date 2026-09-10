@@ -6,6 +6,7 @@ export const profile = {
   phone: '+62 896 3223 0344',
   linkedin: 'https://linkedin.com/in/chossopian',
   site: 'https://sopian.id',
+  cvUrl: '/CV-Muhamad-Sopian.pdf',
   summary:
     "Innovative Application Developer & IT Administrative Specialist with end-to-end expertise in enterprise administration, cloud infrastructure, and workflow automation. Proven track record in managing Google Workspace Admin ecosystems, building custom management applications (AppSheet), and orchestrating automated pipelines using n8n and Google Apps Script. Proficient in self-hosted DevOps environments (Docker, Dokploy, Linux VPS) and implementing AI agent frameworks to transform complex administrative operations into efficient, intelligent digital systems.",
 };
