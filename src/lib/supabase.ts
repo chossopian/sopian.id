@@ -11,7 +11,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseAnonKey || 'placeholder-key',
+  {
+    // Fail fast instead of hanging if the self-hosted instance is slow/unreachable
+    global: {
+      fetch: (url, options) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+          clearTimeout(timeoutId)
+        );
+      },
+    },
+  }
 );
 
 export interface Post {
@@ -28,33 +40,65 @@ export interface Post {
   updated_at: string;
 }
 
-export async function getPublishedPosts(): Promise<Post[]> {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false });
+// --- Simple in-memory cache (per server process) ---
+// Avoids hitting Supabase on every single request, which was causing
+// multi-second delays on the /blog pages. TTL keeps content reasonably fresh.
+const CACHE_TTL_MS = 60_000; // 1 minute
 
-  if (error) {
-    console.error('[supabase] Failed to fetch posts:', error.message);
-    return [];
+let postsCache: { data: Post[]; expiresAt: number } | null = null;
+const postCacheBySlug = new Map<string, { data: Post | null; expiresAt: number }>();
+
+export async function getPublishedPosts(): Promise<Post[]> {
+  if (postsCache && postsCache.expiresAt > Date.now()) {
+    return postsCache.data;
   }
 
-  return data as Post[];
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (error) {
+      console.error('[supabase] Failed to fetch posts:', error.message);
+      // Serve stale cache if available instead of an empty list
+      return postsCache?.data ?? [];
+    }
+
+    const posts = data as Post[];
+    postsCache = { data: posts, expiresAt: Date.now() + CACHE_TTL_MS };
+    return posts;
+  } catch (err) {
+    console.error('[supabase] Error fetching posts (timeout or network issue):', err);
+    return postsCache?.data ?? [];
+  }
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single();
-
-  if (error) {
-    console.error('[supabase] Failed to fetch post:', error.message);
-    return null;
+  const cached = postCacheBySlug.get(slug);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.data;
   }
 
-  return data as Post;
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single();
+
+    if (error) {
+      console.error('[supabase] Failed to fetch post:', error.message);
+      return cached?.data ?? null;
+    }
+
+    const post = data as Post;
+    postCacheBySlug.set(slug, { data: post, expiresAt: Date.now() + CACHE_TTL_MS });
+    return post;
+  } catch (err) {
+    console.error('[supabase] Error fetching post (timeout or network issue):', err);
+    return cached?.data ?? null;
+  }
 }
