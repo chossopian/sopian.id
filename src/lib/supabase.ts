@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
     '[supabase] SUPABASE_URL or SUPABASE_ANON_KEY is not set. Blog features will not work until these are configured in .env'
   );
+} else {
+  console.log(`[supabase] Using Supabase URL: ${supabaseUrl}`);
 }
 
 export const supabase = createClient(
@@ -53,12 +55,15 @@ export async function getPublishedPosts(): Promise<Post[]> {
     return postsCache.data;
   }
 
+  const startTime = Date.now();
   try {
     const { data, error } = await supabase
       .from('posts')
       .select('*')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
+
+    console.log(`[supabase] getPublishedPosts took ${Date.now() - startTime}ms`);
 
     if (error) {
       console.error('[supabase] Failed to fetch posts:', error.message);
@@ -70,7 +75,7 @@ export async function getPublishedPosts(): Promise<Post[]> {
     postsCache = { data: posts, expiresAt: Date.now() + CACHE_TTL_MS };
     return posts;
   } catch (err) {
-    console.error('[supabase] Error fetching posts (timeout or network issue):', err);
+    console.error(`[supabase] Error fetching posts after ${Date.now() - startTime}ms (timeout or network issue):`, err);
     return postsCache?.data ?? [];
   }
 }
