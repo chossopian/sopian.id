@@ -75,20 +75,41 @@ const currentPath = Astro.url.pathname;
 </header>
 
 <script>
-  function setupThemeToggle() {
+  let mobileMenuController: AbortController | null = null;
+  let themeController: AbortController | null = null;
+
+  function setupHeader() {
+    // Batalkan listener lama sebelum pasang yang baru (cegah double-bind)
+    mobileMenuController?.abort();
+    themeController?.abort();
+
+    mobileMenuController = new AbortController();
+    themeController = new AbortController();
+
     const toggle = document.getElementById('theme-toggle');
-    toggle?.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
+    toggle?.addEventListener(
+      'click',
+      () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      },
+      { signal: themeController.signal }
+    );
 
     const mobileToggle = document.getElementById('mobile-menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
-    mobileToggle?.addEventListener('click', () => {
-      mobileMenu?.classList.toggle('hidden');
-    });
+    mobileToggle?.addEventListener(
+      'click',
+      () => {
+        mobileMenu?.classList.toggle('hidden');
+      },
+      { signal: mobileMenuController.signal }
+    );
   }
 
-  setupThemeToggle();
-  document.addEventListener('astro:page-load', setupThemeToggle);
+  // Panggil langsung saat script di-parse (cover hard refresh & direct open di HP)
+  setupHeader();
+
+  // Panggil lagi setiap View Transition navigation selesai (rebind DOM baru)
+  document.addEventListener('astro:page-load', setupHeader);
 </script>
