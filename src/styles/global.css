@@ -1,2 +1,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+/* Tailwind v4 default dark mode pakai media query (prefers-color-scheme).
+   Override ini agar dark: utilities bereaksi terhadap class .dark di ancestor
+   (dipakai JS toggle di Header.astro). */
+@variant dark (&:where(.dark, .dark *));
+
