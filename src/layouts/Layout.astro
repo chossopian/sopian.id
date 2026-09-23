@@ -53,9 +53,18 @@ const socialImageURL = new URL(image, Astro.site || Astro.url.origin).href;
     <ClientRouter />
 
     <script is:inline>
+      // Inisialisasi tema pada first load / hard refresh
       const theme = localStorage.getItem('theme') ||
         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.classList.toggle('dark', theme === 'dark');
+
+      // Pertahankan class .dark saat View Transition navigation.
+      // astro:before-swap memberi akses ke newDocument SEBELUM DOM di-swap,
+      // sehingga kita bisa copy state dark ke halaman berikutnya tanpa flash.
+      document.addEventListener('astro:before-swap', (e) => {
+        const isDark = document.documentElement.classList.contains('dark');
+        e.newDocument.documentElement.classList.toggle('dark', isDark);
+      });
     </script>
   </head>
   <body class="bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans antialiased transition-colors duration-300">
@@ -82,7 +91,10 @@ const socialImageURL = new URL(image, Astro.site || Astro.url.origin).href;
         items.forEach((item) => observer.observe(item));
       }
 
-      initScrollReveal();
+      // 'astro:page-load' already fires on the initial page load as well
+      // as every client-side view-transition navigation, so a single
+      // listener here is sufficient (avoids double-running the observer
+      // setup on first load).
       document.addEventListener('astro:page-load', initScrollReveal);
     </script>
   </body>
