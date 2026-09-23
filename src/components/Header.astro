@@ -41,17 +41,33 @@ const currentPath = Astro.url.pathname;
       >
         Resume
       </a>
-      <button
-        id="theme-toggle"
-        aria-label="Toggle dark mode"
-        class="p-2 rounded-full text-neutral-500 hover:text-emerald-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-      >
-        <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-        </svg>
-        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-        </svg>
+
+      <!-- Tactile Dark/Light Toggle (dari test.html) -->
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="tt-socket">
+          <span class="tt-face">
+            <span class="tt-glow"></span>
+
+            <!-- Moon — tampil saat dark mode -->
+            <svg class="tt-icon tt-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.3 4.9c.4-.2.6-.7.5-1.1s-.6-.7-1-.6C6.2 3.9 2 8.7 2 14.5 2 20.3 6.7 25 12.5 25c5.8 0 10.6-4.2 11.3-9.8.1-.5-.2-.9-.6-1s-.9.1-1.1.5c-1.5 2.6-4.3 4.3-7.6 4.3-4.7 0-8.5-3.8-8.5-8.5 0-3.3 1.7-6.1 4.3-7.6z"/>
+            </svg>
+
+            <!-- Sun — tampil saat light mode -->
+            <svg class="tt-icon tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" fill="currentColor"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+
+          </span>
+        </span>
       </button>
 
       <button id="mobile-menu-toggle" class="md:hidden p-2 text-neutral-600 dark:text-neutral-300" aria-label="Toggle menu">
@@ -73,6 +89,155 @@ const currentPath = Astro.url.pathname;
     </a>
   </div>
 </header>
+
+<!-- ============================================================
+     Tactile Toggle Styles
+     Diadaptasi dari test.html:
+       - test.html: default = dark, body.light-mode = light
+       - portfolio:  html.dark  = dark, html:not(.dark)  = light
+     ============================================================ -->
+<style is:global>
+  :root {
+    --tt-step: 0.25s;
+    --tt-ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --tt-size: 1.75rem; /* tinggi socket — diperkecil dari 4rem bawaan */
+  }
+
+  /* Wrapper tombol */
+  .theme-toggle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateZ(0);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Socket (lekukan luar) — DEFAULT = dark mode */
+  .tt-socket {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--tt-size) * 2.2);
+    height: var(--tt-size);
+    border-radius: 9999px;
+    background: #090a0d;
+    padding: 3px;
+    box-shadow:
+      inset 0 4px 8px rgba(0, 0, 0, 0.9),
+      inset 0 -2px 4px rgba(255, 255, 255, 0.05),
+      0 1px 1px rgba(255, 255, 255, 0.08);
+    transition:
+      box-shadow var(--tt-step) var(--tt-ease),
+      background var(--tt-step) var(--tt-ease);
+  }
+
+  /* Face (permukaan fisik) — DEFAULT = dark mode */
+  .tt-face {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, #242730 0%, #131418 100%);
+    box-shadow:
+      0 4px 10px rgba(0, 0, 0, 0.7),
+      inset 0 1px 1px rgba(255, 255, 255, 0.22),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.9);
+    transition:
+      scale var(--tt-step) var(--tt-ease),
+      box-shadow var(--tt-step) var(--tt-ease);
+  }
+
+  /* Efek tekan (active state) */
+  .theme-toggle:active .tt-socket {
+    box-shadow:
+      inset 0 3px 6px rgba(0, 0, 0, 0.9),
+      inset 0 -1px 3px rgba(255, 255, 255, 0.04);
+  }
+  .theme-toggle:active .tt-face {
+    scale: 0.97;
+  }
+
+  /* Glow di belakang ikon — DEFAULT = dark (biru) */
+  .tt-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(147, 197, 253, 0.35) 0%, transparent 65%);
+    opacity: 1;
+    pointer-events: none;
+    transition:
+      opacity var(--tt-step) var(--tt-ease),
+      background var(--tt-step) var(--tt-ease);
+  }
+
+  /* Ikon */
+  .tt-icon {
+    width: 1rem;
+    height: 1rem;
+    z-index: 1;
+    transition:
+      transform var(--tt-step) var(--tt-ease),
+      opacity var(--tt-step) var(--tt-ease);
+  }
+
+  /* Moon — tampil di dark mode */
+  .tt-moon {
+    color: #e0f2fe;
+    filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.9));
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  /* Sun — tersembunyi di dark mode */
+  .tt-sun {
+    position: absolute;
+    color: #f59e0b;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.9));
+    opacity: 0;
+    transform: scale(0.4) rotate(-90deg);
+  }
+
+  /* ============================================================
+     STATE: LIGHT MODE — ketika html TIDAK memiliki class .dark
+     ============================================================ */
+
+  html:not(.dark) .tt-socket {
+    background: #c7cbd1;
+    box-shadow:
+      inset 0 4px 7px rgba(0, 0, 0, 0.22),
+      inset 0 -2px 4px rgba(255, 255, 255, 0.9),
+      0 1px 2px rgba(255, 255, 255, 0.4);
+  }
+
+  html:not(.dark) .tt-face {
+    background: linear-gradient(180deg, #ffffff 0%, #e2e5e9 100%);
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.12),
+      inset 0 1px 1px rgba(255, 255, 255, 1),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  html:not(.dark) .tt-glow {
+    background: radial-gradient(circle at center, rgba(251, 191, 36, 0.45) 0%, transparent 65%);
+  }
+
+  /* Light mode: moon hilang, sun muncul */
+  html:not(.dark) .tt-moon {
+    opacity: 0;
+    transform: scale(0.4) rotate(90deg);
+  }
+  html:not(.dark) .tt-sun {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+</style>
 
 <script>
   let mobileMenuController: AbortController | null = null;
